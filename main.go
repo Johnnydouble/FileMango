@@ -157,6 +157,7 @@ func queueFile(path string) bool {
 				fmt.Println("WriteString failed, my final message")
 				panic("panik!")
 			}
+			fmt.Println("Discovered File:", path)
 			return true
 		}
 
