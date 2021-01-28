@@ -158,6 +158,8 @@ func queueFile(path string) bool {
 				panic("panik!")
 			}
 			fmt.Println("Discovered File:", path)
+			//eventually this should be replaced with something that uses the fileQueue to ensure that unexpected stops are handled gracefully
+			go processFile(path)
 			return true
 		}
 
@@ -165,9 +167,6 @@ func queueFile(path string) bool {
 	return false
 }
 
-func processFile(path string) {
-
-}
 func initFileExtensions() []string {
 	supportedExtensionsFilepath := "./supportedExtensions"
 	extFile, _ := os.Open(supportedExtensionsFilepath)
