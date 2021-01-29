@@ -3,29 +3,23 @@ package main
 import (
 	"fmt"
 	"os"
+	"sync"
 )
 
+//use mutex to ensure that writes happen synchronously
+var mutex sync.Mutex
+
 func processFile(path string) {
-	var qFile, _ = os.OpenFile("./fileQueue.txt", os.O_RDWR, 600) //rw for user, nothing for group and everyone
+	mutex.Lock()
+	var qFile, _ = os.OpenFile("./file_queue.txt", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 600) //rw for user, nothing for group and everyone
 	defer qFile.Close()
+	defer mutex.Unlock()
 	if _, err := qFile.WriteString(path + "\n"); err != nil {
-		fmt.Println("WriteString failed, my final message")
-		panic("panik!")
+		fmt.Println("WriteString to file queue failed")
+		panic(err)
 	}
 	fmt.Println("Discovered File:", path)
-}
 
-//func confirmFiletype(path string) {
-//	//sections := strings.Split(path, "/")
-//
-//	cmd := exec.Command("/usr/bin/file", "--brief", path)
-//
-//	var out bytes.Buffer
-//	cmd.Stdout = &out
-//
-//	err := cmd.Run()
-//	if err != nil {
-//		panic(err)
-//	}
-//	fmt.Println("filetype:", out.String())
-//}
+	//todo: remove debug
+
+}

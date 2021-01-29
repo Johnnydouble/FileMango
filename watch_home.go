@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"fmt"
 	"github.com/fsnotify/fsnotify"
-	"github.com/pkg/xattr"
 	"log"
 	"net/http"
 	"os"
@@ -118,7 +117,7 @@ func queueFile(path string) bool {
 	//allow file names with certain fileTypes
 	for _, fileType := range fileTypes {
 		if fileType == getFileType(path) {
-			go processFile(path)
+			processFile(path)
 			return true
 		}
 
@@ -127,8 +126,6 @@ func queueFile(path string) bool {
 }
 
 func handleEvent(event fsnotify.Event, watcher *fsnotify.Watcher) {
-	fmt.Println("EVENT:", event)
-
 	switch event.Op {
 	case fsnotify.Create:
 		handleChange(event)
@@ -141,19 +138,13 @@ func handleEvent(event fsnotify.Event, watcher *fsnotify.Watcher) {
 
 func handleChange(event fsnotify.Event) {
 	path := event.Name
-	fileInfo, err := os.Stat(path) // file path
+	fileInfo, err := os.Stat(path)
 	if err != nil {
 		fmt.Println("File Stopped Existing Between Event and os.Stat:", err)
 		return
 	}
-	/*TESTING SECTION*/
 
 	queueFile(path)
-
-	//testing xattrs
-	list, _ := xattr.List(path)
-	fmt.Println("xattr(s):", list)
-	/*END TESTING SECTION*/
 
 	_ = watchDir(path, fileInfo, err)
 }
@@ -169,10 +160,15 @@ func getFileType(path string) string {
 
 	// Get the content
 	contentType, err := GetFileContentType(f)
-	if err != nil || contentType == "application/octet-stream" {
+
+	fallbackType := "application/octet-stream"
+	if err != nil || contentType == fallbackType {
 		contentType = handleUnknownContentType(f)
 	}
-	fmt.Println(contentType)
+	if contentType == "" {
+		contentType = fallbackType
+	}
+
 	return contentType
 }
 
@@ -186,14 +182,15 @@ func GetFileContentType(out *os.File) (string, error) {
 		return "", err
 	}
 
-	// Use the net/http package's handy DectectContentType function. Always returns a valid
-	// content-type by returning "application/octet-stream" if no others seemed to match.
+	// default content type is "application/octet-stream"
 	contentType := http.DetectContentType(buffer)
 
 	return contentType, nil
 }
 
 func handleUnknownContentType(f *os.File) string {
+	//todo: change this to a pipeline model so that 'file' doesnt have to start each time its needed
+	//todo: investigate why "," is being appended to the ASCII.text content type some of the time
 	cmd := exec.Command("/usr/bin/file", "--brief", f.Name())
 
 	var out bytes.Buffer
@@ -203,9 +200,20 @@ func handleUnknownContentType(f *os.File) string {
 	if err != nil {
 		panic(err)
 	}
+
 	result := strings.Split(out.String(), " ")
-	if len(result) < 2 {
-		return "application/octet-stream"
+
+	//this is kinda kludgy
+	resultStr := ""
+	switch len(result) {
+	case 0:
+	case 1:
+		resultStr = result[0]
+	case 2:
+		resultStr = result[0] + "." + result[1]
+	default:
+		resultStr = result[0] + "." + result[1]
 	}
-	return "filemango/" + result[0] + "." + result[1]
+
+	return "filemango/" + resultStr
 }

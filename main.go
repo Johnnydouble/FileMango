@@ -15,8 +15,8 @@ var fileTypes = initFileTypes()
 // main
 func main() {
 	rootDir := getUserHome() + "/"
-	watchHome(rootDir)
 	createInitialFileQueue(rootDir)
+	watchHome(rootDir)
 }
 
 func getUserHome() string {
