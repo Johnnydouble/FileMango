@@ -203,14 +203,11 @@ func handleUnknownContentType(f *os.File) string {
 
 	result := strings.Split(out.String(), " ")
 
-	//this is kinda kludgy
 	resultStr := ""
 	switch len(result) {
 	case 0:
 	case 1:
 		resultStr = result[0]
-	case 2:
-		resultStr = result[0] + "." + result[1]
 	default:
 		resultStr = result[0] + "." + result[1]
 	}
