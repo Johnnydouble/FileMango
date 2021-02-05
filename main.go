@@ -2,6 +2,8 @@ package main
 
 import (
 	"bufio"
+	"encoding/json"
+	"fmt"
 	"github.com/fsnotify/fsnotify"
 	"io"
 	"log"
@@ -9,14 +11,18 @@ import (
 	"os/user"
 )
 
+var configPath = "./config.json"
 var watcher *fsnotify.Watcher
 var fileTypes = initFileTypes()
 
 // main
 func main() {
-	rootDir := getUserHome() + "/"
-	createInitialFileQueue(rootDir)
-	watchHome(rootDir)
+	config := loadConfig(configPath)
+	//rootDir := getUserHome() + "/"
+	for _, dir := range config.Directories {
+		createInitialFileQueue(dir)
+		watchHome(dir)
+	}
 }
 
 func getUserHome() string {
@@ -37,4 +43,22 @@ func initFileTypes() []string {
 		extensions = append(extensions, scanner.Text())
 	}
 	return extensions
+}
+
+//information to be provided in the configuration file
+type Config struct {
+	Directories []string
+	Modules     []string
+}
+
+func loadConfig(file string) Config {
+	var config Config
+	configFile, err := os.Open(file)
+	defer configFile.Close()
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+	jsonParser := json.NewDecoder(configFile)
+	jsonParser.Decode(&config)
+	return config
 }
