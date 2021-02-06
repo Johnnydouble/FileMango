@@ -1,4 +1,35 @@
 {
-  "Directories": ["/home"],
-  "Modules": ["test"]
+  "UserConfig": {
+    "Directories": ["/home/"]
+  },
+  "ModuleConfig": {
+    "Modules": ["test"],
+    "FileTypes": [
+      {
+        "Type": "image/gif",
+        "Modules": [
+          "test",
+          "lexiconOcr"
+        ]
+      },
+      {
+        "Type": "image/png",
+        "Modules": [
+          "test"
+        ]
+      },
+      {
+        "Type": "image/jpeg",
+        "Modules": [
+          "test"
+        ]
+      },
+      {
+        "Type": "image/webp",
+        "Modules": [
+          "test"
+        ]
+      }
+    ]
+  }
 }

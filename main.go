@@ -18,8 +18,9 @@ var fileTypes = initFileTypes()
 // main
 func main() {
 	config := loadConfig(configPath)
-	//rootDir := getUserHome() + "/"
-	for _, dir := range config.Directories {
+	config.UserConfig.Directories = append(config.UserConfig.Directories, getUserHome()+"/")
+	fmt.Printf("%+v", config)
+	for _, dir := range config.UserConfig.Directories {
 		createInitialFileQueue(dir)
 		watchHome(dir)
 	}
@@ -47,8 +48,22 @@ func initFileTypes() []string {
 
 //information to be provided in the configuration file
 type Config struct {
+	UserConfig   UserConfig
+	ModuleConfig ModuleConfig
+}
+
+type UserConfig struct {
 	Directories []string
-	Modules     []string
+}
+type ModuleConfig struct {
+	Modules   []string
+	FileTypes []FileType
+}
+
+//a supported filetype and the
+type FileType struct {
+	Type    string
+	Modules []string
 }
 
 func loadConfig(file string) Config {
