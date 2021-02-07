@@ -1,6 +1,8 @@
-package main
+package watch
 
 import (
+	"FileMango_AAS/src/config"
+	"FileMango_AAS/src/scheduler"
 	"bytes"
 	"fmt"
 	"github.com/fsnotify/fsnotify"
@@ -12,13 +14,15 @@ import (
 	"strings"
 )
 
-func watchHome(rootDir string) {
-	fmt.Println(rootDir)
+var watcher *fsnotify.Watcher
+var fileTypes []string
+
+func WatchHome(rootDir string) {
+	fileTypes = config.GetComputedConfig().Types
+
 	/*CREATE INITIAL FILE QUEUE*/
 
 	/*WATCH FS FOR UPDATES*/
-
-	fmt.Println("watching...")
 
 	// creates a new file watcher
 	watcher, _ = fsnotify.NewWatcher()
@@ -30,10 +34,8 @@ func watchHome(rootDir string) {
 		fmt.Println("ERROR", err)
 	}
 
-	//
 	done := make(chan bool)
 
-	//
 	go func() {
 		for {
 			select {
@@ -65,7 +67,6 @@ func watchDir(path string, fi os.FileInfo, err error) error {
 	if fi.IsDir() {
 		return watcher.Add(path)
 	}
-
 	return nil
 }
 
@@ -93,7 +94,8 @@ func shouldWatch(path string) bool {
 	return true
 }
 
-func createInitialFileQueue(rootDir string) {
+func CreateInitialFileQueue(rootDir string) {
+	fileTypes = config.GetComputedConfig().Types
 	/*OPEN OR CREATE QUEUE FILE*/
 
 	_ = filepath.Walk(rootDir, func(path string, fi os.FileInfo, err error) error {
@@ -104,7 +106,6 @@ func createInitialFileQueue(rootDir string) {
 }
 
 func queueFile(path string) bool {
-
 	if !shouldWatch(path) {
 		return false
 	}
@@ -117,7 +118,7 @@ func queueFile(path string) bool {
 	//allow file names with certain fileTypes
 	for _, fileType := range fileTypes {
 		if fileType == getFileType(path) {
-			processFile(path)
+			scheduler.ProcessFile(path)
 			return true
 		}
 
