@@ -6,7 +6,6 @@ import (
 	"bytes"
 	"fmt"
 	"github.com/fsnotify/fsnotify"
-	"log"
 	"net/http"
 	"os"
 	"os/exec"
@@ -24,12 +23,11 @@ func WatchHome(rootDir string) {
 
 	/*WATCH FS FOR UPDATES*/
 
-	// creates a new file watcher
+	//create a new file watcher
 	watcher, _ = fsnotify.NewWatcher()
 	defer func() { _ = watcher.Close() }()
 
-	// starting at the root of the project, walk each file/directory searching for
-	// directories
+	//starting at the root of the project, walk each file/directory searching for directories
 	if err := filepath.Walk(rootDir, watchDir); err != nil {
 		fmt.Println("ERROR", err)
 	}
@@ -53,11 +51,12 @@ func WatchHome(rootDir string) {
 	<-done
 }
 
-// watchDir gets run as a walk func, searching for directories to add watchers to
+//watchDir gets run as a walk func, searching for directories to add watchers to
 func watchDir(path string, fi os.FileInfo, err error) error {
-	//handle err from fs watcher.Walk and stat
+	//todo:handle err from fs watcher.Walk and stat
 	if err != nil {
-		log.Fatal(err)
+		fmt.Println(err)
+		return nil
 	}
 
 	if !shouldWatch(path) {
