@@ -1,8 +1,8 @@
 package main
 
 import (
-	"FileMango_AAS/src/config"
-	"FileMango_AAS/src/watch"
+	"FileMango/src/config"
+	"FileMango/src/watch"
 	"fmt"
 )
 

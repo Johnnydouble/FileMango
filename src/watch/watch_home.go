@@ -1,8 +1,8 @@
 package watch
 
 import (
-	"FileMango_AAS/src/config"
-	"FileMango_AAS/src/scheduler"
+	"FileMango/src/config"
+	"FileMango/src/scheduler"
 	"bytes"
 	"fmt"
 	"github.com/fsnotify/fsnotify"
