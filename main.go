@@ -17,6 +17,6 @@ func main() {
 	for _, dir := range cfg.UserConfig.Directories {
 		watch.CreateInitialFileQueue(dir)
 		fmt.Println("watching...")
-		watch.WatchHome(dir)
+		watch.Create(dir)
 	}
 }
