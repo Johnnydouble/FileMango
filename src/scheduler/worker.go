@@ -10,12 +10,11 @@ import (
 
 func createWorker(msg chan message, programPath string) <-chan string {
 	var cmd *exec.Cmd
-	done := make(chan bool, 2)
 
 	cmd = exec.Command(programPath)
 	in, _ := cmd.StdinPipe()
 	out, _ := cmd.StdoutPipe()
-	outChan := readIntoChannel(out, done)
+	outChan := readIntoChannel(out)
 	cmd.Start()
 
 	//communicate with worker
@@ -29,10 +28,7 @@ func createWorker(msg chan message, programPath string) <-chan string {
 			default:
 				if msgObj.Type == stop {
 					in.Write(marshalMessage(msgObj))
-					done <- true
-
 					out.Close()
-					fmt.Println("RECIEVED")
 				}
 			}
 		}
@@ -63,23 +59,14 @@ func marshalMessage(msg message) []byte {
 	return message
 }
 
-func readIntoChannel(rc io.ReadCloser, done <-chan bool) chan string {
+func readIntoChannel(rc io.ReadCloser) chan string {
 	out := make(chan string)
 	go func() {
 		reader := bufio.NewScanner(rc)
-		for {
-			if !reader.Scan() {
-				fmt.Println("done")
-				return
-			}
-			fmt.Println("line read...")
-			select {
-			case out <- reader.Text():
-			case <-done:
-				fmt.Println("done")
-				return
-			}
+		for reader.Scan() {
+			out <- reader.Text()
 		}
+		fmt.Println("SUCCESS")
 	}()
 	return out
 }
