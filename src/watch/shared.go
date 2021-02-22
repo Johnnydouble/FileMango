@@ -1,7 +1,6 @@
 package watch
 
 import (
-	"FileMango/src/scheduler"
 	"bytes"
 	"github.com/fsnotify/fsnotify"
 	"net/http"
@@ -51,7 +50,7 @@ func queueFile(path string) bool {
 	//allow file names with certain fileTypes
 	for _, fileType := range fileTypes {
 		if fileType == getFileType(path) {
-			scheduler.ProcessFile(path) //todo: consider moving code from this function into that one or vice versa
+			ProcessFile(path) //todo: consider moving code from this function into that one or vice versa
 			return true
 		}
 

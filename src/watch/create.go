@@ -35,7 +35,7 @@ func Create(rootDir string) {
 
 			// watch for errors
 			case err := <-watcher.Errors:
-				fmt.Println("ERROR", err)
+				fmt.Println("WATCH ERROR: ", err)
 			}
 		}
 	}()

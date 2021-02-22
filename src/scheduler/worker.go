@@ -21,12 +21,12 @@ func createWorker(msg chan message, programPath string) <-chan string {
 	go func() {
 		for {
 			msgObj := <-msg
-			switch msgObj.Type {
+			switch msgObj.Input.Type {
 			case analyze, resume, suspend:
 				in.Write(marshalMessage(msgObj))
 				in.Write([]byte("\n"))
 			default:
-				if msgObj.Type == stop {
+				if msgObj.Input.Type == stop {
 					in.Write(marshalMessage(msgObj))
 					out.Close()
 				}
@@ -35,20 +35,6 @@ func createWorker(msg chan message, programPath string) <-chan string {
 	}()
 	return outChan
 }
-
-type message struct {
-	Type messageType
-	Data string
-}
-
-type messageType int
-
-const (
-	analyze messageType = iota
-	suspend
-	resume
-	stop
-)
 
 func marshalMessage(msg message) []byte {
 	message, err := json.Marshal(msg)
@@ -66,7 +52,38 @@ func readIntoChannel(rc io.ReadCloser) chan string {
 		for reader.Scan() {
 			out <- reader.Text()
 		}
+		close(out)
 		fmt.Println("SUCCESS")
 	}()
 	return out
 }
+
+//Message Data Structures
+
+type message struct {
+	Input  input
+	Output output
+}
+
+type input struct {
+	Type messageType
+	Data string
+}
+
+type output struct {
+	Pairs []pair
+}
+
+type pair struct {
+	Key   string
+	Value string
+}
+
+type messageType int
+
+const (
+	analyze messageType = iota
+	suspend
+	resume
+	stop
+)
