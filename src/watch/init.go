@@ -7,7 +7,7 @@ import (
 )
 
 func CreateInitialFileQueue(rootDir string) {
-	fileTypes = config.GetComputedConfig().Types
+	fileTypes = getFieldSlice(config.GetFileTypes())
 	/*OPEN OR CREATE QUEUE FILE*/
 
 	_ = filepath.Walk(rootDir, func(path string, fi os.FileInfo, err error) error {

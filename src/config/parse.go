@@ -33,57 +33,63 @@ func loadConfig(file string) Config {
 }
 
 func computeConfig() ComputedConfig {
-	fileTypes := configObj.ModuleConfig.FileTypes
-	var Types []string
-	var Modules []string
-
-	for _, modType := range fileTypes {
-		Types = append(Types, modType.Type)
-	}
-
-	for _, fileType := range fileTypes {
-		modList := fileType.Modules
-		for _, mod := range modList {
-			if !Contains(Modules, mod) {
-				Modules = append(Modules, mod)
-			}
+	cfg := ComputedConfig{}
+	modules := configObj.ModuleConfig.Modules
+	for _, module := range modules {
+		for _, fileType := range module.FileTypes {
+			cfg.invertTree(fileType, module.Name, module.Path)
 		}
 	}
-
-	return ComputedConfig{Types, Modules}
+	return cfg
 }
 
-func Contains(list []string, x string) bool {
-	for _, item := range list {
-		if item == x {
+func (f *ComputedConfig) invertTree(ftype, name, path string) {
+	for i, item := range f.FileTypes {
+		//if an entry for this file type exists append this module to it and return
+		if item.Type == ftype {
+			f.FileTypes[i].ModuleNames = append(f.FileTypes[i].ModuleNames, name)
+			f.FileTypes[i].ModulePaths = append(f.FileTypes[i].ModulePaths, path)
+			return
+		}
+	}
+	//if an entry for this file type does not exist create one
+	f.FileTypes = append(f.FileTypes, FileAssociation{
+		ftype,
+		[]string{name},
+		[]string{path},
+	})
+}
+
+func (f *ComputedConfig) contains(x string) bool {
+	for _, item := range f.FileTypes {
+		if item.Type == x {
 			return true
 		}
 	}
 	return false
 }
 
-//Config File Data Structures
+//structure representing the config file
 type Config struct {
-	UserConfig   UserConfig
-	ModuleConfig ModuleConfig
-}
-
-type UserConfig struct {
-	Directories []string
-}
-
-type ModuleConfig struct {
-	FileTypes []FileType
-}
-
-//a supported filetype and the
-type FileType struct {
-	Type    string
-	Modules []string
+	UserConfig struct {
+		Directories []string `json:"Directories"`
+	} `json:"UserConfig"`
+	ModuleConfig struct {
+		Modules []struct {
+			Name      string   `json:"Name"`
+			Path      string   `json:"Path"`
+			FileTypes []string `json:"FileTypes"`
+		} `json:"Modules"`
+	} `json:"ModuleConfig"`
 }
 
 //runtime configuration struct
 type ComputedConfig struct {
-	Types   []string
-	Modules []string
+	FileTypes []FileAssociation
+}
+
+type FileAssociation struct {
+	Type        string
+	ModuleNames []string
+	ModulePaths []string
 }

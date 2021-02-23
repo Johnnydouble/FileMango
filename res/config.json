@@ -3,30 +3,26 @@
     "Directories": ["~"]
   },
   "ModuleConfig": {
-    "FileTypes": [
+    "Modules": [
       {
-        "Type": "image/gif",
-        "Modules": [
-          "test",
-          "lexiconOcr"
+        "Name": "test",
+        "Path": "usr/bin/cat",
+        "FileTypes": [
+          "image/png",
+          "image/jpeg",
+          "image/gif",
+          "image/webp"
         ]
       },
       {
-        "Type": "image/png",
-        "Modules": [
-          "test"
-        ]
-      },
-      {
-        "Type": "image/jpeg",
-        "Modules": [
-          "test"
-        ]
-      },
-      {
-        "Type": "image/webp",
-        "Modules": [
-          "test"
+        "Name": "example",
+        "Path": "/home/melkor/go/src/exampleModule/main",
+        "FileTypes": [
+          "text/plain",
+          "image/png",
+          "image/jpeg",
+          "image/gif",
+          "image/webp"
         ]
       }
     ]

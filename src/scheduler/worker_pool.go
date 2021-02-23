@@ -68,14 +68,14 @@ type job struct {
 }
 
 func (as analysisSystem) addNewJobs(qF *bufio.Scanner) {
-	modCfg := config.GetConfig().ModuleConfig
+	FileTypes := config.GetFileTypes()
 	for qF.Scan() {
 		//todo: might want to handle the potential errors...
 		file, _ := os.Open(qF.Text())
 		fileType, _ := watch.GetFileContentType(file)
-		for _, supportedType := range modCfg.FileTypes {
+		for _, supportedType := range FileTypes {
 			if fileType == supportedType.Type {
-				for _, module := range supportedType.Modules {
+				for _, module := range supportedType.ModulePaths {
 					as.jobs = append(as.jobs, initJob(module, file.Name()))
 				}
 			}

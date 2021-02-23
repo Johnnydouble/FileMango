@@ -1,6 +1,7 @@
 package watch
 
 import (
+	"FileMango/src/config"
 	"bytes"
 	"github.com/fsnotify/fsnotify"
 	"net/http"
@@ -12,6 +13,14 @@ import (
 
 var watcher *fsnotify.Watcher
 var fileTypes []string
+
+func getFieldSlice(slice []config.FileAssociation) []string {
+	out := make([]string, len(slice))
+	for i, e := range slice {
+		out[i] = e.Type
+	}
+	return out
+}
 
 func shouldWatch(path string) bool {
 	dir, _ := filepath.Split(path)

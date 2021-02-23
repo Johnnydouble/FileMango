@@ -7,6 +7,7 @@ import (
 
 var configObj Config
 var computedConfigObj ComputedConfig
+var fileTypes []FileAssociation
 
 func InitConfig(cfgFile string) {
 	configObj = loadConfig(cfgFile)
@@ -17,6 +18,7 @@ func InitConfig(cfgFile string) {
 	}
 
 	computedConfigObj = computeConfig()
+	fileTypes = computedConfigObj.FileTypes
 }
 
 func GetConfig() Config {
@@ -25,6 +27,10 @@ func GetConfig() Config {
 
 func GetComputedConfig() ComputedConfig {
 	return computedConfigObj
+}
+
+func GetFileTypes() []FileAssociation {
+	return fileTypes
 }
 
 //non public functions

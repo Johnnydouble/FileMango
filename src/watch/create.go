@@ -9,7 +9,7 @@ import (
 )
 
 func Create(rootDir string) {
-	fileTypes = config.GetComputedConfig().Types
+	fileTypes = getFieldSlice(config.GetFileTypes())
 
 	/*CREATE INITIAL FILE QUEUE*/
 
