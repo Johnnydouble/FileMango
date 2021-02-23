@@ -10,7 +10,7 @@ import (
 	"os"
 )
 
-var queuePath string = "./res/file_queue.txt"
+var queuePath = "./res/file_queue.txt"
 
 //a function that runs analysis on files that are in a given queue file
 func RunAnalysis() {
@@ -42,6 +42,7 @@ func RunAnalysis() {
 	aggregate := make(chan chan message)
 	go func() {
 		for _, job := range as.jobs {
+			job := job
 			go func() {
 				aggregate <- job.output
 			}()
@@ -63,8 +64,8 @@ type analysisSystem struct {
 }
 
 type job struct {
+	input  chan message
 	output chan message
-	input  <-chan string //this should really probably be a message tbh...
 }
 
 func (as analysisSystem) addNewJobs(qF *bufio.Scanner) {

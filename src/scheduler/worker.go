@@ -8,7 +8,7 @@ import (
 	"os/exec"
 )
 
-func createWorker(msg chan message, programPath string) <-chan string {
+func createWorker(msg chan message, programPath string) chan message {
 	var cmd *exec.Cmd
 
 	cmd = exec.Command(programPath)
@@ -45,17 +45,23 @@ func marshalMessage(msg message) []byte {
 	return message
 }
 
-func readIntoChannel(rc io.ReadCloser) chan string {
-	out := make(chan string)
+func readIntoChannel(rc io.ReadCloser) chan message {
+	out := make(chan message)
 	go func() {
 		reader := bufio.NewScanner(rc)
 		for reader.Scan() {
-			out <- reader.Text()
+			out <- parseMessage(reader.Text())
 		}
 		close(out)
 		fmt.Println("SUCCESS")
 	}()
 	return out
+}
+
+func parseMessage(in string) message {
+	var target message
+	json.Unmarshal([]byte(in), &target)
+	return target
 }
 
 //Message Data Structures
