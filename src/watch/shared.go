@@ -51,8 +51,8 @@ func queueFile(path string) bool {
 		return false
 	}
 
-	fi, _ := os.Stat(path)
-	if fi.IsDir() == true {
+	fi, err := os.Stat(path)
+	if err != nil || fi.IsDir() == true {
 		return false
 	}
 

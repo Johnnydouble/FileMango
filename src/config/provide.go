@@ -12,8 +12,12 @@ var fileTypes []FileAssociation
 func InitConfig(cfgFile string) {
 	configObj = loadConfig(cfgFile)
 	for i, dir := range configObj.UserConfig.Directories {
-		if dir == "~" {
-			configObj.UserConfig.Directories[i] = getUserHome() + "/"
+		if dir[(len(dir)-1)] != '/' {
+			configObj.UserConfig.Directories[i] = configObj.UserConfig.Directories[i] + "/"
+		}
+		if dir[0] == '~' {
+			configObj.UserConfig.Directories[i] = getUserHome() +
+				configObj.UserConfig.Directories[i][1:len(configObj.UserConfig.Directories[i])]
 		}
 	}
 
