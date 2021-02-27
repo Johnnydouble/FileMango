@@ -21,9 +21,9 @@ func ProcessFile(path string) {
 	scanner := bufio.NewScanner(io.Reader(qFile))
 
 	for scanner.Scan() {
-		fmt.Println(scanner.Text())
+		//fmt.Println(scanner.Text())
 		if scanner.Text() == path {
-			fmt.Println("duplicate event detected")
+			//fmt.Println("duplicate event detected")
 			return
 		}
 	}

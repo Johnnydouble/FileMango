@@ -1,13 +1,14 @@
 {
   "UserConfig": {
-    "Directories": ["~", "~/Documents/Misc/"]
+    "Directories": ["~/Downloads"]
   },
   "ModuleConfig": {
     "Modules": [
       {
-        "Name": "test",
-        "Path": "usr/bin/cat",
+        "Name": "example0",
+        "Path": "/home/chrisdev/go/src/exampleModule/main",
         "FileTypes": [
+          "text/plain",
           "image/png",
           "image/jpeg",
           "image/gif",
@@ -15,7 +16,7 @@
         ]
       },
       {
-        "Name": "example",
+        "Name": "example1",
         "Path": "/home/melkor/go/src/exampleModule/main",
         "FileTypes": [
           "text/plain",
