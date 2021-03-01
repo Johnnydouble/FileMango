@@ -84,7 +84,7 @@ func readIntoChannel(rc io.ReadCloser) chan message {
 			out <- parseMessage(reader.Text())
 		}
 		close(out)
-		fmt.Println("SUCCESS")
+		fmt.Println("Module exited successfully")
 	}()
 	return out
 }

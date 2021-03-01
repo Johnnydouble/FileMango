@@ -45,7 +45,7 @@ func QueueFile(path string) {
 	if !db.Has([]byte(path)) {
 		_ = db.Put([]byte(path), []byte(""))
 	} else {
-		fmt.Println("Write to db failed")
+		fmt.Println("Write to db failed", path)
 		return
 	}
 	//scheduler.AddJob(path)

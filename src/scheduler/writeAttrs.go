@@ -14,6 +14,6 @@ func writeAttributes(msg message) {
 			log.Fatal(err)
 		}
 	}
-	fmt.Println("wrote: ", msg, "to attributes")
 	db.DequeueFile(msg.Input.Data)
+	fmt.Printf("wrote: %q to %q attributes and dequeued\n", msg.Output.Pairs, msg.Input.Data)
 }
