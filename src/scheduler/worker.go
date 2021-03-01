@@ -3,19 +3,23 @@ package scheduler
 import (
 	"bufio"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"os/exec"
 )
 
-func createWorker(msg chan message, programPath string) chan message {
+func createWorker(msg chan message, programPath string) (chan message, error) {
 	var cmd *exec.Cmd
 
 	cmd = exec.Command(programPath)
 	in, _ := cmd.StdinPipe()
 	out, _ := cmd.StdoutPipe()
 	outChan := readIntoChannel(out)
-	cmd.Start()
+	if cmd.Start() != nil { //start module
+		//if modules fails to start properly
+		return outChan, errors.New("Module Failed to Start" + programPath)
+	}
 
 	//communicate with worker
 	go func() {
@@ -29,9 +33,10 @@ func createWorker(msg chan message, programPath string) chan message {
 				switch msgObj.Input.Data {
 				case "cpu":
 					pid := cmd.Process.Pid
-					outChan <- generateQueryUsageResponse("cpu", fmt.Sprint(getProcessCpu(int(pid))))
-
+					*msgObj.Header.recipient <- generateInternalResponse(queryUsage, "cpu", fmt.Sprint(getProcessCpu(int(pid))))
 				case "mem":
+					pid := cmd.Process.Pid
+					*msgObj.Header.recipient <- generateInternalResponse(queryUsage, "mem", fmt.Sprint(getProcessMem(int(pid))))
 				}
 			case noop:
 				//yup
@@ -44,18 +49,18 @@ func createWorker(msg chan message, programPath string) chan message {
 			}
 		}
 	}()
-	return outChan
+	return outChan, nil
 }
 
-func generateQueryUsageResponse(t string, val string) message {
+func generateInternalResponse(msgType messageType, args string, val string) message {
 	return message{
 		Input: input{
-			Type: queryUsage,
-			Data: t,
+			Type: msgType,
+			Data: args,
 		},
 		Output: output{
 			Pairs: []pair{{
-				Key:   t,
+				Key:   args,
 				Value: val,
 			}},
 		},
@@ -88,7 +93,7 @@ func parseMessage(in string) message {
 	var target message
 	if json.Unmarshal([]byte(in), &target) != nil {
 		fmt.Println("Error: Failure to unmarshal JSON from external module.")
-		return message{input{noop, in}, output{}} //convert invalid json to noop message
+		return message{header{}, input{noop, in}, output{}} //convert invalid json to noop message
 	}
 	return target
 }
@@ -96,6 +101,7 @@ func parseMessage(in string) message {
 //Message Data Structures
 
 type message struct {
+	Header header
 	Input  input
 	Output output
 }
@@ -114,6 +120,10 @@ type pair struct {
 	Value string
 }
 
+type header struct {
+	recipient *chan message
+}
+
 type messageType int
 
 const (
@@ -122,5 +132,7 @@ const (
 	suspend
 	resume
 	stop
+	//internal types
 	queryUsage
+	modErr
 )

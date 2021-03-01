@@ -8,6 +8,7 @@ import (
 	"github.com/fsnotify/fsnotify"
 	"io"
 	"os"
+	"time"
 )
 
 var queuePath = "./res/file_queue.txt"
@@ -40,20 +41,37 @@ func RunAnalysis() {
 	//do an initial check for jobs
 	queue.addNewJobs(scanner)
 	go handleOutput(metaOutput)
-	managePool() //starts the pool
+	go poolManager() //periodically calls managePool
+}
+
+func poolManager() {
+	go func() {
+		for {
+			managePool()
+			time.Sleep(100 * time.Millisecond) //todo: this might be able to be increased if todos in managePool() are resolved
+		}
+	}()
 }
 
 //creates new active jobs when there is more space in the pool's size than there are actual job objects
 //called whenever a job may be ready to enter or leave the pool
 func managePool() {
-	//todo: use new monitoring stuff to figure out what the size of the pool should be
+	// figure out what the size of the pool should be
+	pool.poolSize = determinePoolSize(pool.poolSize)
 	for len(pool.jobs) < pool.poolSize {
+		if len(queue.preJobs) == 0 {
+			return
+		}
 		//get first jobInfo in fileQueue
 		ji := queue.preJobs[0]
 		//delete it from the preJobs slice
 		queue.preJobs = disorderlyRemove(queue.preJobs, 0)
 		//construct a new job using initJob and add it to activePool
-		newJob := initJob(ji)
+		newJob, err := initJob(ji)
+		if err != nil { //todo: might want to handle this a bit better in the future by iterating until initJob is successful
+			return
+		}
+
 		pool.jobs = append(pool.jobs, newJob)
 		//push the output channel to a meta channel that is being fanned into the writing system
 		metaOutput <- newJob.output
@@ -80,6 +98,10 @@ func handleOutput(metaOut chan chan message) {
 		case analyze:
 			writeAttributes(msg)
 			managePool() //add new jobs if space exists in the pool
+		case modErr:
+			fmt.Println(msg)
+			//todo: check for potential race condition in the future here, messages might need some sort of UUID so that there can be a dialogue between modules and the system about closing.
+			managePool()
 		default:
 			printModuleErr("Unrecognized message type.", msg)
 		}
@@ -155,14 +177,18 @@ type job struct {
 }
 
 //creates a job given a jobInfo and begins analysis
-func initJob(info jobInfo) job {
+func initJob(info jobInfo) (job, error) {
 	in := make(chan message)
-	out := createWorker(in, info.modulePath)
+	out, err := createWorker(in, info.modulePath)
+	if err != nil {
+		close(in) //note that out is already closed
+		return job{}, err
+	}
 	in <- message{
 		Input:  input{Type: analyze, Data: info.filePath},
 		Output: output{},
 	}
-	return job{in, out, info}
+	return job{in, out, info}, nil
 }
 
 //returns if a string slice contains an element
