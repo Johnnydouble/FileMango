@@ -2,6 +2,7 @@ package watch
 
 import (
 	"FileMango/src/config"
+	"FileMango/src/db"
 	"bytes"
 	"github.com/fsnotify/fsnotify"
 	"net/http"
@@ -29,7 +30,7 @@ func shouldWatch(path string) bool {
 	//deny certain home prefixes
 	deniedHomePrefixes := []string{".", "snap", ".zsh_history.LOCK"}
 	for _, prefix := range deniedHomePrefixes {
-		if strings.HasPrefix(sections[3], prefix) {
+		if strings.HasPrefix(sections[3], prefix) { //todo: make more general
 			return false
 		}
 	}
@@ -59,7 +60,7 @@ func queueFile(path string) bool {
 	//allow file names with certain fileTypes
 	for _, fileType := range fileTypes {
 		if fileType == getFileType(path) {
-			ProcessFile(path) //todo: consider moving code from this function into that one or vice versa
+			db.QueueFile(path)
 			return true
 		}
 

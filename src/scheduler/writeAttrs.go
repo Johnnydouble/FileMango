@@ -1,6 +1,7 @@
 package scheduler
 
 import (
+	"FileMango/src/db"
 	"fmt"
 	"github.com/pkg/xattr"
 	"log"
@@ -13,8 +14,6 @@ func writeAttributes(msg message) {
 			log.Fatal(err)
 		}
 	}
-	fmt.Print("WROTE: ")
-	fmt.Print(msg)
-	fmt.Println(" TO ATTRIBUTES")
-	//todo: delete file_queue.txt entry
+	fmt.Println("wrote: ", msg, "to attributes")
+	db.DequeueFile(msg.Input.Data)
 }

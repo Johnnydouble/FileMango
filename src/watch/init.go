@@ -6,13 +6,14 @@ import (
 	"path/filepath"
 )
 
-func CreateInitialFileQueue(rootDir string) {
+func QueueExistingFiles(Directories []string) {
 	fileTypes = getFieldSlice(config.GetFileTypes())
 	/*OPEN OR CREATE QUEUE FILE*/
 
-	_ = filepath.Walk(rootDir, func(path string, fi os.FileInfo, err error) error {
-		queueFile(path)
-		return err
-	})
-
+	for _, dir := range Directories {
+		_ = filepath.Walk(dir, func(path string, fi os.FileInfo, err error) error {
+			queueFile(path)
+			return err
+		})
+	}
 }

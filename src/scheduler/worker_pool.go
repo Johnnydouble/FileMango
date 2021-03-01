@@ -2,10 +2,9 @@ package scheduler
 
 import (
 	"FileMango/src/config"
+	"FileMango/src/db"
 	"FileMango/src/watch"
-	"bufio"
 	"fmt"
-	"github.com/fsnotify/fsnotify"
 	"io"
 	"os"
 	"time"
@@ -18,28 +17,13 @@ var metaOutput = make(chan chan message)
 
 //a function that runs analysis on files that are in a given queue file
 func RunAnalysis() {
-	watcher, _ := fsnotify.NewWatcher()
-	watcher.Add(queuePath)
-	queueFile, _ := os.Open(queuePath)
-	scanner := bufio.NewScanner(io.Reader(queueFile))
-
-	//add new jobs
 	go func() {
-		select {
-		//if the file queue is edited, check for any files that have not already begun being processed.
-		case event := <-watcher.Events:
-			switch event.Op {
-			case fsnotify.Write:
-				queue.addNewJobs(scanner)
-			}
-
-		case err := <-watcher.Errors:
-			fmt.Println("FILE QUEUE WATCH ERROR: ", err)
-		}
+		path := <-db.Ambassador.Path
+		queue.createJob(path)
 	}()
 
 	//do an initial check for jobs
-	queue.addNewJobs(scanner)
+	addInitialJobs()
 	go handleOutput(metaOutput)
 	go poolManager() //periodically calls managePool
 }
@@ -135,18 +119,30 @@ type activePool struct {
 //an in-program representation of the file_queue
 type fileQueue struct {
 	preJobs     []jobInfo
-	pathHistory []string //todo: when attributes are written by writeAttrs.go, they need to be removed from this history
+	pathHistory []string
 }
 
 //adds jobs that have not already been added / are not currently processing to the fileQueue
-func (q *fileQueue) addNewJobs(pathQueue *bufio.Scanner) {
-	for pathQueue.Scan() {
-		if !stringSliceContains(q.pathHistory, pathQueue.Text()) {
-			file, _ := os.Open(pathQueue.Text())
-			q.pathHistory = append(q.pathHistory, file.Name()) //add file to history to prevent duplicates
-			q.analyzeFile(file)
-		}
+func (q *fileQueue) createJob(path string) {
+	if !stringSliceContains(q.pathHistory, path) {
+		file, _ := os.Open(path)
+		q.pathHistory = append(q.pathHistory, path) //add file to history to prevent duplicates
+		q.analyzeFile(file)
+		file.Close()
 	}
+}
+
+//export createJob
+func AddJob(path string) {
+	queue.createJob(path)
+}
+
+func addInitialJobs() {
+	add := func(key []byte) error {
+		AddJob(string(key))
+		return nil
+	}
+	_ = db.FoldQueue(add)
 }
 
 //create jobs with corresponding providers and add them to the specified fileQueue

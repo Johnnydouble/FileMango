@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 )
 
-func Create(rootDir string) {
+func Create(Directories []string) {
 	fileTypes = getFieldSlice(config.GetFileTypes())
 
 	/*CREATE INITIAL FILE QUEUE*/
@@ -17,14 +17,14 @@ func Create(rootDir string) {
 
 	//create a new file watcher
 	watcher, _ = fsnotify.NewWatcher()
-	defer func() { _ = watcher.Close() }()
+	//defer func() { _ = watcher.Close() }()
 
 	//starting at the root of the project, walk each file/directory searching for directories
-	if err := filepath.Walk(rootDir, watchDir); err != nil {
-		fmt.Println("ERROR", err)
+	for _, dir := range Directories {
+		if err := filepath.Walk(dir, watchDir); err != nil {
+			fmt.Println("ERROR", err)
+		}
 	}
-
-	done := make(chan bool)
 
 	go func() {
 		for {
@@ -39,8 +39,6 @@ func Create(rootDir string) {
 			}
 		}
 	}()
-
-	<-done
 }
 
 //runs as a walk func, searching for directories to add watchers to

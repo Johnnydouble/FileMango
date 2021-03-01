@@ -3,11 +3,23 @@ package cli
 import (
 	"flag"
 	"fmt"
+	"github.com/postfinance/single"
 	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
 )
+
+func Single() {
+	one, err := single.New("FileMango", single.WithLockPath("/tmp"))
+	if err != nil {
+		log.Fatal(err)
+	}
+	err = one.Lock()
+	if err != nil {
+		log.Fatal(err)
+	}
+}
 
 func HandleFlags() *bool {
 	detach := flag.Bool("d", false,
