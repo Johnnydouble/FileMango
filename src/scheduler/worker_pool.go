@@ -18,8 +18,10 @@ var metaOutput = make(chan chan message)
 //a function that runs analysis on files that are in a given queue file
 func RunAnalysis() {
 	go func() {
-		path := <-db.Ambassador.Path
-		queue.createJob(path)
+		for {
+			path := <-db.Ambassador.Path
+			queue.createJob(path)
+		}
 	}()
 
 	//do an initial check for jobs
