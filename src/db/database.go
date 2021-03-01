@@ -32,6 +32,13 @@ func Init(pathi string) {
 
 }
 
+func Close() {
+	err := db.Close()
+	if err != nil {
+		fmt.Println(err)
+	}
+}
+
 func FoldQueue(f func(key []byte) error) error {
 	mutex.Lock()
 	defer mutex.Unlock()
@@ -44,12 +51,13 @@ func QueueFile(path string) {
 	defer db.Sync()
 	if !db.Has([]byte(path)) {
 		_ = db.Put([]byte(path), []byte(""))
+		Ambassador.Path <- path
+		fmt.Println(path, "queued")
 	} else {
 		fmt.Println("Write to db failed", path)
 		return
 	}
 	//scheduler.AddJob(path)
-	Ambassador.Path <- path
 }
 
 func DequeueFile(path string) {

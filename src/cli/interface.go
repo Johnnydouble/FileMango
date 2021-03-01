@@ -1,12 +1,14 @@
 package cli
 
 import (
+	"FileMango/src/db"
 	"flag"
 	"fmt"
 	"github.com/postfinance/single"
 	"log"
 	"os"
 	"os/exec"
+	"os/signal"
 	"path/filepath"
 )
 
@@ -19,6 +21,16 @@ func Single() {
 	if err != nil {
 		log.Fatal(err)
 	}
+}
+
+func HandleSignal() {
+	killSignal := make(chan os.Signal, 1)
+	signal.Notify(killSignal, os.Interrupt)
+	<-killSignal
+	fmt.Print("Exiting... ")
+	db.Close()
+	fmt.Print("done.")
+	os.Exit(0)
 }
 
 func HandleFlags() *bool {

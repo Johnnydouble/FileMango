@@ -36,6 +36,5 @@ func run() {
 	//run analysis on the files in the queue
 	scheduler.RunAnalysis()
 	//keep the program from exiting
-	done := make(chan bool)
-	<-done
+	cli.HandleSignal()
 }
