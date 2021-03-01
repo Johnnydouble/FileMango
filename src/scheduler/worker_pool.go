@@ -144,7 +144,9 @@ func addInitialJobs() {
 		AddJob(string(key))
 		return nil
 	}
-	_ = db.FoldQueue(add)
+	err := db.FoldQueue(add)
+	if err != nil {
+	}
 }
 
 //create jobs with corresponding providers and add them to the specified fileQueue
