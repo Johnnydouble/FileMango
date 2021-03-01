@@ -93,7 +93,7 @@ func parseMessage(in string) message {
 	var target message
 	if json.Unmarshal([]byte(in), &target) != nil {
 		fmt.Println("Error: Failure to unmarshal JSON from external module.")
-		return message{header{}, input{noop, in}, output{}} //convert invalid json to noop message
+		return message{header{}, input{noop, in, ""}, output{}} //convert invalid json to noop message
 	}
 	return target
 }
@@ -107,8 +107,9 @@ type message struct {
 }
 
 type input struct {
-	Type messageType
-	Data string
+	Type    messageType
+	Data    string
+	ModPath string
 }
 
 type output struct {

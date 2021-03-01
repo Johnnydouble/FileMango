@@ -15,5 +15,6 @@ func writeAttributes(msg message) {
 		}
 	}
 	db.DequeueFile(msg.Input.Data)
+	pool.jobs = disorderlyRemoveJob(pool.jobs, jobInfo{msg.Input.ModPath, msg.Input.Data})
 	fmt.Printf("wrote: %q to %q attributes and dequeued\n", msg.Output.Pairs, msg.Input.Data)
 }

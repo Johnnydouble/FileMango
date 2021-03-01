@@ -202,7 +202,19 @@ func stringSliceContains(slice []string, elem string) bool {
 }
 
 //removes an element from a slice without preserving indices
-func disorderlyRemove(s []jobInfo, i int) []jobInfo {
+func disorderlyRemove(s []jobInfo, i int) []jobInfo { //todo: rename
 	s[len(s)-1], s[i] = s[i], s[len(s)-1]
+	return s[:len(s)-1]
+}
+
+func disorderlyRemoveJob(s []job, ji jobInfo) []job {
+	var index int
+	for i, j := range pool.jobs {
+		if j.info == ji {
+			index = i
+			break
+		}
+	}
+	s[len(s)-1], s[index] = s[index], s[len(s)-1]
 	return s[:len(s)-1]
 }
