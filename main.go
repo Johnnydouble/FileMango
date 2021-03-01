@@ -5,12 +5,28 @@ import (
 	"FileMango/src/scheduler"
 	"FileMango/src/watch"
 	"fmt"
+	"github.com/postfinance/single"
+	"log"
 )
 
 var configPath = "./res/config.json"
 
 // main
 func main() {
+	run()
+}
+
+func run() {
+	one, err := single.New("FileMango", single.WithLockPath("/tmp"))
+	if err != nil {
+		log.Fatal(err)
+	}
+	// lock and defer unlocking
+	err = one.Lock()
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer one.Unlock()
 	config.InitConfig(configPath)
 	cfg := config.GetConfig()
 	ComputedCfg := config.GetComputedConfig()
@@ -23,5 +39,5 @@ func main() {
 	}
 	scheduler.RunAnalysis() //non functional right now
 	//todo: WARNING: MAY CAUSE ISSUES WHEN DAEMONIZED
-	fmt.Scanln() //wait for keypress to exit
+	_, _ = fmt.Scanln() //wait for keypress to exit
 }
