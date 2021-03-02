@@ -1,24 +1,10 @@
 package config
 
 import (
-	"bufio"
 	"encoding/json"
 	"fmt"
-	"io"
 	"os"
 )
-
-func initFileTypes() []string {
-	supportedExtensionsFilepath := "./supportedTypes"
-	extFile, _ := os.Open(supportedExtensionsFilepath)
-	defer extFile.Close()
-	scanner := bufio.NewScanner(io.Reader(extFile))
-	extensions := make([]string, 0)
-	for scanner.Scan() {
-		extensions = append(extensions, scanner.Text())
-	}
-	return extensions
-}
 
 func loadConfig(file string) Config {
 	var config Config
