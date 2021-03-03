@@ -7,18 +7,21 @@ import (
 	"fmt"
 	"io"
 	"os/exec"
+	"strings"
 )
 
-func createWorker(msg chan message, programPath string) (chan message, error) {
+func createWorker(msg chan message, programCmd string) (chan message, error) {
 	var cmd *exec.Cmd
 
-	cmd = exec.Command(programPath)
+	programPath, args := processCommand(programCmd)
+
+	cmd = exec.Command(programPath, args...)
 	in, _ := cmd.StdinPipe()
 	out, _ := cmd.StdoutPipe()
 	outChan := readIntoChannel(out)
 	if cmd.Start() != nil { //start module
 		//if modules fails to start properly
-		return outChan, errors.New("Module Failed to Start" + programPath)
+		return outChan, errors.New("Module Failed to Start" + programCmd)
 	}
 
 	//communicate with worker
@@ -96,6 +99,21 @@ func parseMessage(in string) message {
 		return message{header{}, input{noop, in, ""}, output{}} //convert invalid json to noop message
 	}
 	return target
+}
+
+func processCommand(fullCommand string) (string, []string) {
+	cmdParts := strings.Split(fullCommand, " ")
+
+	programPath := ""
+	var args []string
+
+	if len(cmdParts) > 0 {
+		programPath = cmdParts[0]
+		for i := 1; i < len(cmdParts); i++ {
+			args = append(args, cmdParts[i])
+		}
+	}
+	return programPath, args
 }
 
 //Message Data Structures

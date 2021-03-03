@@ -25,6 +25,13 @@
           "image/gif",
           "image/webp"
         ]
+      },
+      {
+        "Name": "example2-java",
+        "Path": "/usr/bin/java -jar /home/chrisdev/Downloads/FileMangoExampleModuleJava.jar",
+        "FileTypes": [
+          "image/png"
+        ]
       }
     ]
   }
