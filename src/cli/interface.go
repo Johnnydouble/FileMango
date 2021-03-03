@@ -12,8 +12,11 @@ import (
 	"path/filepath"
 )
 
+var one *single.Single
+
 func Single() {
-	one, err := single.New("FileMango", single.WithLockPath("/tmp"))
+	var err error
+	one, err = single.New("FileMango", single.WithLockPath("/tmp"))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -29,6 +32,7 @@ func HandleSignal() {
 	<-killSignal
 	fmt.Print("Exiting... ")
 	db.Close()
+	_ = one.Unlock()
 	fmt.Print("done.")
 	os.Exit(0)
 }
