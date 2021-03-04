@@ -4,6 +4,7 @@ import (
 	"FileMango/src/config"
 	"FileMango/src/db"
 	"bytes"
+	"fmt"
 	"github.com/fsnotify/fsnotify"
 	"net/http"
 	"os"
@@ -73,7 +74,9 @@ func getFileType(path string) string {
 	// Open File
 	f, err := os.Open(path)
 	if err != nil {
-		panic(err)
+		fmt.Println("File \"" + path + "\" File stopped existing at getFileType.")
+		fmt.Println(err)
+		return "File does not exist." //todo: may want to implement passing error up
 	}
 	defer f.Close()
 
