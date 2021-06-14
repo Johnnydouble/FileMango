@@ -27,7 +27,7 @@ bibliography: paper.bib
 Metadata is an incredibly valuable asset in the modern world. File metadata in particular can be leveraged by programs in order to improve a wide range of user experiences. In order to meet this demand for metadata, we developed and tested a framework for automatically mining and saving useful file metadata on a user’s system. The framework continuously watches for files of specific types within specific directories that are specified in a configuration file. The configuration file also contains a list of external programs that implement a standard file analyzer interface, and the file types that each program operates on. Once a file of the correct type is found, the framework runs one or many of the aforementioned external programs in parallel and specifies, through the standard interface, the file to analyze. Over time, the framework receives file metadata results from each external program. These results are then saved to the disk by the framework in a manner that associates them directly with the file. The completed system was tested on its ability to do these tasks while maintaining a reasonable performance footprint. Our testing indicated that the system was working as expected but some runtime warnings were logged throughout the process. The system met our baseline expectations but could ultimately be improved with changes to the implementation and to the interface that the program has with external analysis programs.
 
 # Statement Of Need
-Metadata is an incredibly valuable asset in the modern world. Programs of all types can use it to customize experiences, speed up user workflows, and categorize large quantities of data using a relatively small amount of information (“Metadata and Its Importance in a Data Driven World”). In order to meet this demand for metadata, this project sets out to create a system for automatically analyzing files on a user’s system. This will lighten the workload for developers, allowing them to focus on building out functionality instead of analysis automation infrastructure.  It functions at a high level by finding analyzable files, analyzing them using appropriate programs, and then saving the results in a convenient format.
+Metadata is an incredibly valuable asset in the modern world. Programs of all types can use it to customize experiences, speed up user workflows, and categorize large quantities of data using a relatively small amount of information [@metadata_importance]. In order to meet this demand for metadata, this project sets out to create a system for automatically analyzing files on a user’s system. This will lighten the workload for developers, allowing them to focus on building out functionality instead of analysis automation infrastructure.  It functions at a high level by finding analyzable files, analyzing them using appropriate programs, and then saving the results in a convenient format.
 
 # Design Goals
 The high level goal of this project is to provide a framework for software developers that is able to run modular file analysis programs on desired files within desired directories. There are three sub goals that inform the design of the system and that the implementation must follow.
@@ -59,13 +59,21 @@ Lastly the cli subsystem ensures that only one instance of the program is runnin
 Testing was conducted by setting up a low overhead virtual machine, creating automation scripts to ensure consistency between tests, and then finally running the tests that were devised. The environment and tests were created iteratively, as it was necessary to ensure that the program would at least be able to run within the virtual environment, and some additional software was found to be necessary along the way.
 Creating the testing environment consisted of taking the following steps.
 1. Install Debian 10 to a virtual machine
+   
 2. Install sudo, p7zip-full, gnupg, and curl to facilitate easier setup.
+   
 3. Create a new, unprivileged user “test” with a home directory and some common XDG directories (Desktop, Documents, Downloads, Music, Pictures, Public, Templates, Videos).
+   
 4. Download 100 image files to use as a sample for the program to run across and place them on the machine by uploading them to a file hosting service and then redownloading them using the preinstalled wget utility
+   
 5. Place the program binary, sample modules, and a premade config file into the test user’s ~/FMbundle
+   
 6. Install any dependencies of the modules. (java for the java test module)
+   
 7. Create a bash script (see Appendix F) that saves the program’s output, CPU usage, and written attributes.
+   
 8. Satisfy dependencies and tweak bash script until it is capable of running the program.
+   
 9. Save a snapshot of the virtual machine in its current state.
 
 In step 8 of the process it was necessary to make many small changes to the bash script, ensure that the program and its modules were in the correct directory, tweak the configuration file so that it was representative of the virtual environment, and install jdk14. The tweaks consisted of minor changes to the script like removing typos and one major change, namely that attributes were collected with a separate command that was run post-test “getfattr -Rd ./”. At this time Debian 10 JDK 14 was not available in the standard repos so it was necessary to install it via the zulu repos so that the program could run.
