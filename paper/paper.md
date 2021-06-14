@@ -84,7 +84,7 @@ Upload the output files.
 Revert to the virtual machine’s save state
 Repeat steps 1 through 3 two more times
 
-![Fig. 2 Resource usage data aggregated from three tests\label{fig:Figure 2}](graph.png)
+![Resource usage data aggregated from three tests\label{fig:Figure 2}](graph.png)
 
 Three tests were performed and data was saved as three separate files for each (see Appendices G, H, and I). The graph (Fig. 2.) shows that memory usage was constant for each of the tests and CPU usage dropped off slowly over time following the initial spike in usage and the file downloads that were performed after the initial cohort of files in the test.
 Inspecting the task manager (htop) after running one of the tests showed that the java modules were staying open even after the program had completed all of its tasks. External analysis modules staying open past when they have completed their tasks constitutes a memory leak which would mean that given a long enough time span the system would crash. Proper support for intelligently closing modules that have completed their task would be necessary in order to make this software viable for real world application. This system would be implemented by creating a dialog of close messages between the main system and the external module to determine a close deadline and then eventually enforce it by manually sending it an OS termination signal.
