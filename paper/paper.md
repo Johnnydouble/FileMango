@@ -23,26 +23,6 @@ date: 13 June 2021
 bibliography: paper.bib
 ---
 
----
-title: 'Gala: A Python package for galactic dynamics'
-tags:
-- Python
-- astronomy
-- dynamics
-- galactic dynamics
-- milky way
-  authors:
-- name: Adrian M. Price-Whelan
-  orcid: 0000-0003-0872-7098
-  affiliation: 1
-  affiliations:
-- name: Lyman Spitzer, Jr. Fellow, Princeton University
-  index: 1
-  date: 13 August 2017
-  bibliography: paper.bib
----
-
-
 # Summary
 Metadata is an incredibly valuable asset in the modern world. File metadata in particular can be leveraged by programs in order to improve a wide range of user experiences. In order to meet this demand for metadata, we developed and tested a framework for automatically mining and saving useful file metadata on a user’s system. The framework continuously watches for files of specific types within specific directories that are specified in a configuration file. The configuration file also contains a list of external programs that implement a standard file analyzer interface, and the file types that each program operates on. Once a file of the correct type is found, the framework runs one or many of the aforementioned external programs in parallel and specifies, through the standard interface, the file to analyze. Over time, the framework receives file metadata results from each external program. These results are then saved to the disk by the framework in a manner that associates them directly with the file. The completed system was tested on its ability to do these tasks while maintaining a reasonable performance footprint. Our testing indicated that the system was working as expected but some runtime warnings were logged throughout the process. The system met our baseline expectations but could ultimately be improved with changes to the implementation and to the interface that the program has with external analysis programs.
 
