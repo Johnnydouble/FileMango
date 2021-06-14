@@ -22,7 +22,8 @@ FileMango relies on the specific programs you want to use, choose and install wh
 
 3. Configure 
 
-In order to run the analysis FileMango has to have a module interface program for each module you wish to use. Some examples are located [here](https://github.com/Johnnydouble/FileMangoExampleModule) and [here](https://github.com/holozene/exampleModule), fork and edit them or reverse engineer make your own (if you develop one let us know by creating an issue). Then add entries to [config.json](https://github.com/Johnnydouble/FileMango/blob/master/res/config.json) for each module interface. Filetypes are specefied as [mime types](https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types).
+In order to run the analysis FileMango has to have a module interface program for each module you wish to use. Some examples are located [here](https://github.com/Johnnydouble/FileMangoExampleModule) and [here](https://github.com/holozene/exampleModule), fork and edit them or reverse engineer your own (if you develop one please let us know by creating an issue on this repo!). Then add entries to [config.json](https://github.com/Johnnydouble/FileMango/blob/master/res/config.json) for each module interface. Filetypes are specified as [mime types](https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types).
+Finally select the directories where you would like to keep metadata updated using the `Directories` field.
 
 4. Autorun 
 
