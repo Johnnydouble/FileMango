@@ -9,16 +9,16 @@ tags:
   - Systems Software 
 authors:
   - name: Christen Spadavecchia
-  orcid: 0000-0002-7193-0729
-  affiliation: “1, 2”
+    orcid: 0000-0002-7193-0729
+    affiliation: “1, 2”
   - name: Oliver Easton
-  orcid: 0000-0001-6365-4333
-  affiliation: “1, 2” 
+    orcid: 0000-0001-6365-4333
+    affiliation: “1, 2” 
 affiliations:
   - name: Mountlake Terrace High School
-  index: 1
+    index: 1
   - name: Michael Thornes, Programming Enthusiast, Mountlake Terrace High School
-  index: 2
+    index: 2
 date: 13 June 2021
 bibliography: paper.bib
 ---
