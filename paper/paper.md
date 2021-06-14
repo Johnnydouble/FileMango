@@ -59,8 +59,8 @@ Lastly the cli subsystem ensures that only one instance of the program is runnin
 Testing was conducted by setting up a low overhead virtual machine, creating automation scripts to ensure consistency between tests, and then finally running the tests that were devised. The environment and tests were created iteratively, as it was necessary to ensure that the program would at least be able to run within the virtual environment, and some additional software was found to be necessary along the way.
 Creating the testing environment consisted of taking the following steps.
 
-1. Install Debian 10 to a virtual machine   
-2. Install sudo, p7zip-full, gnupg, and curl to facilitate easier setup.
+1. Install Debian 10 to a virtual machine
+2. 2. Install sudo, p7zip-full, gnupg, and curl to facilitate easier setup.
 3. Create a new, unprivileged user “test” with a home directory and some common XDG directories (Desktop, Documents, Downloads, Music, Pictures, Public, Templates, Videos).
 4. Download 100 image files to use as a sample for the program to run across and place them on the machine by uploading them to a file hosting service and then redownloading them using the preinstalled wget utility
 5. Place the program binary, sample modules, and a premade config file into the test user’s ~/FMbundle
