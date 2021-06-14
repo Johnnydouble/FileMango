@@ -8,7 +8,7 @@ Metadata is an incredibly valuable asset in the modern world. File metadata in p
 
 ### Paper
 
-A paper detailing our design and development process is located in /paper.
+A paper detailing our design and development process is located in paper/.
 
 ## How to Use
 
