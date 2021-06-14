@@ -47,7 +47,7 @@ The final prerequisite was to be able to write procured data from each of the mo
 
 
 # Program Control Flow
-![Fig. 1 File watch routine flowchart (left) and File analysis routine flowchart (right)\label{fig:Figure 1}](flowchart.png)
+!["File watch routine flowchart (left) and File analysis routine flowchart (right)"\label{fig:Figure 1}](flowchart.png)
 Figure 1 diagrams the high level control flow of the system for watching files for changes. There are two main subsystems in the framework that communicate through the file queue to collectively oversee the assignment of metadata attributes to files.  The first routine builds an initial list of files that are eligible for further processing and then sets up watchers over the user’s home directory to monitor for changes to important files. The second routine has multiple responsibilities. First it dispatches analysis to modules by sending the correct modules paths to files that they are able to provide analysis. Second it processes the data into a standard form that will make it easy to parse. Finally it writes the standardized metadata to the file’s extended attributes and removes the file’s path from the list. The two routines run asynchronously and files are only removed from the queue after the correct attributes have been fully written in order to ensure that no files are missed or have metadata that exists in a corrupted state if the process is terminated prematurely.
 
 
@@ -82,7 +82,7 @@ Upload the output files.
 Revert to the virtual machine’s save state
 Repeat steps 1 through 3 two more times
 
-![Fig. 2 Resource usage data aggregated from three tests\label{fig:Figure 2}](graph.png)
+![Resource usage data aggregated from three tests\label{fig:Figure 2}](graph.png)
 
 Three tests were performed and data was saved as three separate files for each (see Appendices G, H, and I). The graph (Fig. 2.) shows that memory usage was constant for each of the tests and CPU usage dropped off slowly over time following the initial spike in usage and the file downloads that were performed after the initial cohort of files in the test.
 Inspecting the task manager (htop) after running one of the tests showed that the java modules were staying open even after the program had completed all of its tasks. External analysis modules staying open past when they have completed their tasks constitutes a memory leak which would mean that given a long enough time span the system would crash. Proper support for intelligently closing modules that have completed their task would be necessary in order to make this software viable for real world application. This system would be implemented by creating a dialog of close messages between the main system and the external module to determine a close deadline and then eventually enforce it by manually sending it an OS termination signal.
