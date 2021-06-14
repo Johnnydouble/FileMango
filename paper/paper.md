@@ -58,22 +58,15 @@ Lastly the cli subsystem ensures that only one instance of the program is runnin
 
 Testing was conducted by setting up a low overhead virtual machine, creating automation scripts to ensure consistency between tests, and then finally running the tests that were devised. The environment and tests were created iteratively, as it was necessary to ensure that the program would at least be able to run within the virtual environment, and some additional software was found to be necessary along the way.
 Creating the testing environment consisted of taking the following steps.
-1. Install Debian 10 to a virtual machine
-   
+
+1. Install Debian 10 to a virtual machine   
 2. Install sudo, p7zip-full, gnupg, and curl to facilitate easier setup.
-   
 3. Create a new, unprivileged user “test” with a home directory and some common XDG directories (Desktop, Documents, Downloads, Music, Pictures, Public, Templates, Videos).
-   
 4. Download 100 image files to use as a sample for the program to run across and place them on the machine by uploading them to a file hosting service and then redownloading them using the preinstalled wget utility
-   
 5. Place the program binary, sample modules, and a premade config file into the test user’s ~/FMbundle
-   
 6. Install any dependencies of the modules. (java for the java test module)
-   
 7. Create a bash script (see Appendix F) that saves the program’s output, CPU usage, and written attributes.
-   
 8. Satisfy dependencies and tweak bash script until it is capable of running the program.
-   
 9. Save a snapshot of the virtual machine in its current state.
 
 In step 8 of the process it was necessary to make many small changes to the bash script, ensure that the program and its modules were in the correct directory, tweak the configuration file so that it was representative of the virtual environment, and install jdk14. The tweaks consisted of minor changes to the script like removing typos and one major change, namely that attributes were collected with a separate command that was run post-test “getfattr -Rd ./”. At this time Debian 10 JDK 14 was not available in the standard repos so it was necessary to install it via the zulu repos so that the program could run.
