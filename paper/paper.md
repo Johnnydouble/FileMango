@@ -10,15 +10,13 @@ tags:
 authors:
   - name: Christen Spadavecchia
     orcid: 0000-0002-7193-0729
-    affiliation: “1, 2”
+    affiliation: 1
   - name: Oliver Easton
     orcid: 0000-0001-6365-4333
-    affiliation: “1, 2” 
+    affiliation: 1 
 affiliations:
   - name: Mountlake Terrace High School
     index: 1
-  - name: Michael Thornes, Programming Enthusiast, Mountlake Terrace High School
-    index: 2
 date: 13 June 2021
 bibliography: paper.bib
 ---
@@ -104,6 +102,7 @@ None of this budget was used.
 
 # Acknowledgements
 
-We would like to thank Michael Thornes for his recommendation to use Go and for helping us learn the language very quickly.
+Michael Thornes recommended writing this project in Go and helped us get off the ground with Go quickly.
+Bryan Smelcer and the Mountlake Terrace High School Stem Program provided us the amazing chance to work on this project.
 
 # References
