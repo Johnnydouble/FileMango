@@ -23,17 +23,21 @@ date: 13 June 2021
 bibliography: paper.bib
 ---
 
+
 # Summary
 Metadata is an incredibly valuable asset in the modern world. File metadata in particular can be leveraged by programs in order to improve a wide range of user experiences. In order to meet this demand for metadata, we developed and tested a framework for automatically mining and saving useful file metadata on a user’s system. The framework continuously watches for files of specific types within specific directories that are specified in a configuration file. The configuration file also contains a list of external programs that implement a standard file analyzer interface, and the file types that each program operates on. Once a file of the correct type is found, the framework runs one or many of the aforementioned external programs in parallel and specifies, through the standard interface, the file to analyze. Over time, the framework receives file metadata results from each external program. These results are then saved to the disk by the framework in a manner that associates them directly with the file. The completed system was tested on its ability to do these tasks while maintaining a reasonable performance footprint. Our testing indicated that the system was working as expected but some runtime warnings were logged throughout the process. The system met our baseline expectations but could ultimately be improved with changes to the implementation and to the interface that the program has with external analysis programs.
 
+
 # Statement Of Need
 Metadata is an incredibly valuable asset in the modern world. Programs of all types can use it to customize experiences, speed up user workflows, and categorize large quantities of data using a relatively small amount of information [@metadata_importance]. In order to meet this demand for metadata, this project sets out to create a system for automatically analyzing files on a user’s system. This will lighten the workload for developers, allowing them to focus on building out functionality instead of analysis automation infrastructure.  It functions at a high level by finding analyzable files, analyzing them using appropriate programs, and then saving the results in a convenient format.
+
 
 # Design Goals
 The high level goal of this project is to provide a framework for software developers that is able to run modular file analysis programs on desired files within desired directories. There are three sub goals that inform the design of the system and that the implementation must follow.
 The system must be designed modularly so that any algorithm using any libraries or language can be used. A module is an independent program that contains machine learning models and/or traditional algorithms that create metadata based on the contents of a given file and follow a few communication guidelines for integration. Modules must be able to receive messages including: suspend, resume, analyze, and stop, through standard in [@stdin], handle them gracefully, and then return correct name and value information to the framework through standard out [@stdout].
 The framework must be resilient to unexpected issues at runtime. If the program exits with or without warning, it needs to be able to fix the state of the metadata on any half processed files the next time it is started. If a module is written incorrectly, the framework must ensure that the system can continue functioning with the remaining modules.
 The framework must maintain balanced cpu usage in order to not interfere with the user’s changing demands over time. The framework’s overhead must stay below a cpu usage threshold based on system load by commanding modules to close or suspend in order to not impede urgent tasks.
+
 
 # Design Decisions
 The first step towards creating the system was to research technologies that could be leveraged and decide on how to implement the goals of the framework.
@@ -43,7 +47,7 @@ The final prerequisite was to be able to write procured data from each of the mo
 
 
 # Program Control Flow
-![Fig. 1 (left). File watch routine flowchart and Fig. 2 (right). File analysis routine flowchart\label{fig:Figure 1}](flowchart.png)
+![Fig. 1 File watch routine flowchart (left) and File analysis routine flowchart (right)\label{fig:Figure 1}](flowchart.png)
 Figure 1 diagrams the high level control flow of the system for watching files for changes. There are two main subsystems in the framework that communicate through the file queue to collectively oversee the assignment of metadata attributes to files.  The first routine builds an initial list of files that are eligible for further processing and then sets up watchers over the user’s home directory to monitor for changes to important files. The second routine has multiple responsibilities. First it dispatches analysis to modules by sending the correct modules paths to files that they are able to provide analysis. Second it processes the data into a standard form that will make it easy to parse. Finally it writes the standardized metadata to the file’s extended attributes and removes the file’s path from the list. The two routines run asynchronously and files are only removed from the queue after the correct attributes have been fully written in order to ensure that no files are missed or have metadata that exists in a corrupted state if the process is terminated prematurely.
 
 
@@ -53,6 +57,7 @@ The watch system finds files that can be processed in the directories listed in 
 The analysis system begins analyzing files by reading the queue provided to it by the watch system. It does this by first checking a shared database for any files left over from a previous session that failed to complete analysis and then accepting new files from the watch system directly with the database acting as a backup past this point. As new files are received they are converted into jobs by using the configuration file to look up what modules can handle that file type. These jobs are then stored in an in-memory queue as file-module pairs. Next, jobs are initialized and placed into the active worker pool until the pool reaches its maximum capacity or the total cpu usage of the program and its constituent modules exceeds 25%. When a job completes the resulting output is funneled into a function that writes the tag names and values that were created to the intended files (see Appendix C). This is shortly followed by the job’s removal from the database and worker pool which clears a slot in the pool for the next job.
 The analysis system is aided by smaller subsystems that handle parts of the analysis process. The monitoring subsystem allows module cpu and memory usage to be queried. The worker subsystem abstracts the details of creating and communicating with modules (see Appendix D). The worker pool subsystem manages the conversion of the file queue into a job queue and the execution of the resulting jobs (see Appendix E). The database subsystem acts as the glue between the watch and scheduler systems. The config subsystem provides methods for parsing the configuration file, converting the configuration data to convenient forms and for getting the fields in the configuration file.
 Lastly the cli subsystem ensures that only one instance of the program is running at a time and handles the sigint (shutdown) signal if it is received.
+
 
 # Testing And Analysis
 
@@ -77,11 +82,12 @@ Upload the output files.
 Revert to the virtual machine’s save state
 Repeat steps 1 through 3 two more times
 
+![Fig. 2 Resource usage data aggregated from three tests\label{fig:Figure 2}](graph.png)
 
-
-Three tests were performed and data was saved as three separate files for each (see Appendices G, H, and I). The graph (Fig. 3.) shows that memory usage was constant for each of the tests and CPU usage dropped off slowly over time following the initial spike in usage and the file downloads that were performed after the initial cohort of files in the test.
+Three tests were performed and data was saved as three separate files for each (see Appendices G, H, and I). The graph (Fig. 2.) shows that memory usage was constant for each of the tests and CPU usage dropped off slowly over time following the initial spike in usage and the file downloads that were performed after the initial cohort of files in the test.
 Inspecting the task manager (htop) after running one of the tests showed that the java modules were staying open even after the program had completed all of its tasks. External analysis modules staying open past when they have completed their tasks constitutes a memory leak which would mean that given a long enough time span the system would crash. Proper support for intelligently closing modules that have completed their task would be necessary in order to make this software viable for real world application. This system would be implemented by creating a dialog of close messages between the main system and the external module to determine a close deadline and then eventually enforce it by manually sending it an OS termination signal.
 The testing output contained some warnings, indicating that for certain files, writing to the database was failing (see Appendix G pages 47-48). These were the result of repeated attempts to write the same file path to the database several times. The program’s behavior in this respect is desirable, but the superfluous logging of unimportant warnings is inelegant. To resolve the warning the file watcher would have to debounce repeated inotify events from the Linux system.
+
 
 # Conclusion
 Program output contained warnings indicating that some events could be handled better internally, especially file write message debouncing.
