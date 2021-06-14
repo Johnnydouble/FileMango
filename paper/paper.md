@@ -47,7 +47,7 @@ The final prerequisite was to be able to write procured data from each of the mo
 
 
 # Program Control Flow
-![Fig. 1 File watch routine flowchart (left) and File analysis routine flowchart (right)\label{fig:Figure 1}](flowchart.png)
+![Fig. 1 File watch routine flowchart and File analysis routine flowchart\label{fig:Figure 1}](flowchart.png)
 Figure 1 diagrams the high level control flow of the system for watching files for changes. There are two main subsystems in the framework that communicate through the file queue to collectively oversee the assignment of metadata attributes to files.  The first routine builds an initial list of files that are eligible for further processing and then sets up watchers over the user’s home directory to monitor for changes to important files. The second routine has multiple responsibilities. First it dispatches analysis to modules by sending the correct modules paths to files that they are able to provide analysis. Second it processes the data into a standard form that will make it easy to parse. Finally it writes the standardized metadata to the file’s extended attributes and removes the file’s path from the list. The two routines run asynchronously and files are only removed from the queue after the correct attributes have been fully written in order to ensure that no files are missed or have metadata that exists in a corrupted state if the process is terminated prematurely.
 
 
