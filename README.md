@@ -35,4 +35,4 @@ In order to make use of the output of Filemango you must read the Extended Attri
 
 ## Authors
 
-Created by Christen Spadavecchia and Oliver Easton
+Created by Christen Spadavecchia and Allie Easton
